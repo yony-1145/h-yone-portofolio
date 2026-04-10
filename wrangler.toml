@@ -1,0 +1,8 @@
+# Cloudflare Pages — Astro の Functions 用（KV などのバインディング）
+# name はダッシュボードの Pages プロジェクト名と一致させる
+name = "h-yone"
+compatibility_date = "2026-04-10"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "SESSION"

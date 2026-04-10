@@ -54,9 +54,19 @@ cp .env.example .env
 
 サイト名・連絡先メール・SNS などの定数は `src/data/config.ts` を編集してください。
 
-## デプロイ（Cloudflare）
+## デプロイ（Cloudflare Pages）
 
-- ビルド: `pnpm build`（成果物は `dist/`。`@astrojs/cloudflare` が Pages Functions 用アセットを同梱します）
-- ランタイム設定: ルートの [`wrangler.jsonc`](./wrangler.jsonc)（`SESSION` KV は [Astro Sessions](https://docs.astro.build/en/guides/sessions/) 用。ID なしは [Wrangler の自動プロビジョニング](https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning)の対象。手動で作る場合は `id` を追記）
+ダッシュボードで **Workers ではなく Pages** のプロジェクトを作成し、Git リポジトリを接続します。
+
+| 設定 | 値 |
+| --- | --- |
+| ルートディレクトリ | `/`（リポジトリルート） |
+| ビルドコマンド | `pnpm run build` |
+| ビルド出力ディレクトリ | `dist` |
+| 環境変数 | 本番・プレビューそれぞれに `.env.example` 相当を設定 |
+
+- **Node.js**: `package.json` の `engines` に合わせる（例: 20 または 22）
+- **ランタイム / バインディング**: ルートの [`wrangler.toml`](./wrangler.toml)（`SESSION` KV は [Astro Sessions](https://docs.astro.build/en/guides/sessions/) 用。必要ならダッシュボードの **設定 → 関数 → KV バインディング**でも `SESSION` を接続）
 - 手順の詳細は [Astro × Cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) と [Pages のビルド設定](https://developers.cloudflare.com/pages/configuration/build-configuration/)を参照
-- シークレット（`RESEND_*` / `TURNSTILE_SECRET_KEY` など）は Cloudflare の環境変数に設定し、Resend のドメイン・Turnstile の許可ホストをデプロイ先 URL に合わせる
+- ローカルから直接アップロードする場合: `pnpm build` のあと `pnpm exec wrangler pages deploy dist --project-name=h-yone`（プロジェクト名は実際の名前に合わせる）
+- シークレット（`RESEND_*` / `TURNSTILE_SECRET_KEY` など）は Pages の環境変数に設定し、Resend のドメイン・Turnstile の許可ホストをデプロイ先 URL に合わせる
