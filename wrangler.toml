@@ -1,5 +1,6 @@
 # Cloudflare Pages — Astro の Functions 用（KV などのバインディング）
 # name はダッシュボードの Pages プロジェクト名と一致させる
+# Git 連携の Pages では dist ごとアップロードされるため main / [assets] は不要
 name = "h-yone"
 compatibility_date = "2026-04-10"
 compatibility_flags = ["nodejs_compat"]
