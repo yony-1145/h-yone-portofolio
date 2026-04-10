@@ -1,10 +1,13 @@
 {
-	// Pages / Workers 共通のバインディングと互換日付（Astro Cloudflare アダプター用）
-	"name": "h-yone",
-	"compatibility_date": "2025-11-01",
-	"kv_namespaces": [
-		{
-			"binding": "SESSION"
-		}
-	]
+  // Pages / Workers 共通のバインディングと互換日付（Astro Cloudflare アダプター用）
+  "name": "h-yone",
+  "compatibility_date": "2025-11-01",
+  "assets": {
+    "directory": "./dist",
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+    },
+  ],
 }
