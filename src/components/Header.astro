@@ -1,0 +1,132 @@
+---
+import { menuMain } from "~/data/menus";
+import { getLocaleFromUrl, localizePath, t } from "~/i18n";
+
+const rmTrailingSlash = (path: string): string => {
+  return path.endsWith("/") && path.length > 1 
+    ? path.slice(0, path.length - 1) 
+    : path;
+}
+
+const locale = getLocaleFromUrl(Astro.url);
+const otherLocale = locale === "ja" ? "en" : "ja";
+
+const pathname = rmTrailingSlash(Astro.url.pathname);
+const localizedPathname = rmTrailingSlash(localizePath(pathname, locale));
+const switchToHref = localizePath(pathname, otherLocale);
+---
+
+<header
+	x-data="{ open: false, scrolled: false }"
+	@keydown.window.escape="open = false"
+	@scroll.window="scrolled = window.scrollY > 20"
+	class="sticky top-0 z-40 transition-all duration-300"
+	:class="scrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm' : 'bg-transparent'"
+>
+	<div class="container py-6" :class="scrolled && 'py-4'" >
+		<nav class="flex items-center justify-between" aria-label={t("a11y.navMain", locale)}>
+			<a href={localizePath("/", locale)} class="-m-1.5 p-1.5">
+				<p class="font-bold text-4xl text-brand-green">h<span class="text-brand-black">-</span><span class="text-brand-red bg-brand-red/5 px-3 ml-1 rounded-lg">yone</span></p>
+			</a>
+			<div class="flex lg:hidden">
+				<button
+					type="button"
+					class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5"
+					@click="open = true"
+				>
+					<span class="sr-only">{t("a11y.openMenu", locale)}</span>
+					<svg
+						class="size-8 text-brand-green"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						aria-hidden="true"
+						data-slot="icon"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+					</svg>
+				</button>
+			</div>
+			<div class="hidden lg:flex lg:gap-x-12 lg:items-center">
+				{
+					menuMain.map((item) => (
+						<a
+							href={localizePath(item.path, locale)}
+							class={`transition text-base/6 font-semibold hover:text-brand-green ${localizedPathname === rmTrailingSlash(localizePath(item.path, locale)) ? "menu-item-active" : ""}`}
+						>
+							{t(item.key, locale)}
+						</a>
+					))
+				}
+				<a
+					href={switchToHref}
+					class="ml-2 inline-flex items-center rounded-full border border-brand-green/30 px-3 py-1 text-sm font-semibold text-brand-green hover:bg-brand-green/5 transition"
+					aria-label={t("a11y.switchLang", locale)}
+				>
+					{t("lang.switchTo", locale)}
+				</a>
+			</div>
+		</nav>
+		<div class="lg:hidden" x-ref="dialog" x-show="open" x-cloak aria-modal="true">
+			<div
+				class="fixed inset-0 z-50 w-full overflow-y-auto bg-white px-8 py-6"
+				x-show="open"
+				x-transition:enter="transition ease-out"
+				x-transition:enter-start="opacity-0"
+				x-transition:enter-end="opacity-100"
+				x-transition:leave="transition ease-in"
+				x-transition:leave-start="opacity-100"
+				x-transition:leave-end="opacity-0"
+				x-cloak
+			>
+				<div class="flex items-center justify-between">
+					<a href={localizePath("/", locale)} class="-m-1.5 p-1.5">
+						<p class="font-bold text-4xl text-brand-green">h<span class="text-brand-black">-</span><span class="text-brand-red bg-brand-red/5 px-3 ml-1 rounded-lg">yone</span></p>
+					</a>
+					<button type="button" class="-m-2.5 p-2.5 text-brand-red" @click="open = false">
+						<span class="sr-only">{t("a11y.closeMenu", locale)}</span>
+						<svg
+							class="size-8"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="2"
+							stroke="currentColor"
+							aria-hidden="true"
+							data-slot="icon"
+						>
+							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="mt-6 flow-root">
+					<div class="-my-6 divide-y divide-gray-500/10">
+						<div class="space-y-2 py-6 mt-16">
+							{
+								menuMain.map((item) => (
+									<a
+										@click="open = false"
+										href={localizePath(item.path, locale)}
+										class={`block py-2 text-center font-semibold text-3xl ${localizedPathname === rmTrailingSlash(localizePath(item.path, locale)) ? "menu-item-active" : ""}`}
+									>
+										{t(item.key, locale)}
+									</a>
+								))
+							}
+							<a
+								@click="open = false"
+								href={switchToHref}
+								class="block py-3 mt-10 text-center font-semibold text-xl text-brand-green border border-brand-green/30 rounded-full hover:bg-brand-green/5 transition"
+							>
+								{t("lang.switchTo", locale)}
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>

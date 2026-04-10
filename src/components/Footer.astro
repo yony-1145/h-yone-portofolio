@@ -1,0 +1,45 @@
+---
+import { menuMain } from "~/data/menus";
+const currentYear = new Date().getFullYear();
+import { siteName, socialMedia, email } from "~/data/config";
+import { getLocaleFromUrl, localizePath, t } from "~/i18n";
+import SocialIcon from "~/components/SocialIcon.astro";
+const locale = getLocaleFromUrl(Astro.url);
+---
+
+<footer class="bg-gray-700 text-white">
+	<div class="container pt-16 pb-8 text-center">
+		<p class="font-bold text-4xl text-brand-green">h<span class="text-brand-black">-</span><span class="text-brand-red bg-brand-red/5 px-3 ml-1 rounded-lg">yone</span></p>
+		<p class="mt-4 text-white/70 text-sm">{t("footer.tagline", locale)}</p>
+		<a href={email.href} class="inline-block mt-3 text-white hover:text-brand-green transition-colors font-medium">{t("footer.email", locale)}</a>
+
+		<nav class="flex flex-col sm:flex-row items-center justify-center gap-x-12 gap-y-3 font-medium mt-8 mb-8" aria-label={t("a11y.footerNav", locale)}>
+			{
+				menuMain.map((item) => (
+					<a href={localizePath(item.path, locale)} class="hover:underline">
+						{t(item.key, locale)}
+					</a>
+				))
+			}
+		</nav>
+
+		<div class="flex justify-center gap-6 mb-8">
+			{Object.values(socialMedia).map((social) => (
+				<a
+					href={social.url}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-white hover:text-brand-red transition-colors"
+					aria-label={social.label}
+				>
+					<SocialIcon platform={social.platform} class="w-6 h-6" />
+				</a>
+			))}
+		</div>
+
+		<p class="mt-10 text-sm opacity-80">
+			&copy; {currentYear} {siteName}. {t("footer.rightsReserved", locale)}{" "}
+			<a class="underline" href={localizePath("/privacy-policy", locale)}>{t("footer.privacy", locale)}</a>
+		</p>
+	</div>
+</footer>

@@ -1,0 +1,16 @@
+# humanstxt.org/Standard.html
+# This file is used to provide information about the people who have contributed to building the website.
+
+# DEVELOPER
+Name: Hiromi Yonemoto
+Location: Fukuoka, Japan
+Github: https://github.com/yony-1145
+Website: https://h-yone.com
+Email: contact@h-yone.com
+
+# STACK
+
+
+# SITE
+Company: h-yone
+Last update: 2026-04-10
