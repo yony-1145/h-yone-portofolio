@@ -71,6 +71,8 @@ cp .env.example .env
 
 環境変数・シークレットは **Workers** の設定（ダッシュボードまたは `wrangler secret`）に置く。Resend・Turnstile の許可ドメインはデプロイ先 URL に合わせる。
 
+**KV / `SESSION`:** このサイトは `Astro.session` を使っていないため、[`astro.config.mjs`](./astro.config.mjs) で `session.driver: "memory"` とし、Wrangler の `SESSION` KV を要求しないようにしている。後から [Astro Sessions](https://docs.astro.build/en/guides/sessions/) と Cloudflare KV を使う場合は `session` 設定をやめ、`wrangler.toml` に `[[kv_namespaces]]`（既存名前空間なら必ず `id` を指定。未指定の自動作成は同名で [10014](https://developers.cloudflare.com/kv/concepts/kv-namespaces/) になり得る）を追加する。
+
 ### Pages（Git 連携のみ）
 
 ダッシュボードで **Pages** プロジェクトを作り、リポジトリを接続する。
@@ -82,6 +84,6 @@ cp .env.example .env
 | ビルド出力ディレクトリ | `dist` |
 | デプロイコマンド | 空にする（push でビルド・デプロイ） |
 
-`wrangler.toml` の KV などは Pages でも参照されることがある。**Pages では `wrangler deploy` は使わない。** 手元から載せる場合は `pnpm exec wrangler pages deploy dist --project-name=h-yone`。
+`wrangler.toml` は Pages でもバインディング解釈などに使われることがある。**Pages では `wrangler deploy` は使わない。** 手元から載せる場合は `pnpm exec wrangler pages deploy dist --project-name=h-yone`。
 
 詳細は [Astro × Cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) と [Pages のビルド設定](https://developers.cloudflare.com/pages/configuration/build-configuration/)を参照。

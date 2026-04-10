@@ -9,6 +9,10 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
 	site: "https://h-yone.com",
 	base: "/",
+	// Astro.session を使わないため KV バインディング不要。未指定だと @astrojs/cloudflare が SESSION KV を自動要求する。
+	session: {
+		driver: "memory",
+	},
 	// trailingSlash: 'always',
 	integrations: [
 		alpinejs(),

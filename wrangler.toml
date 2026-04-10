@@ -8,6 +8,3 @@ compatibility_flags = ["nodejs_compat"]
 [assets]
 directory = "./dist"
 binding = "ASSETS"
-
-[[kv_namespaces]]
-binding = "SESSION"
