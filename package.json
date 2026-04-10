@@ -7,7 +7,11 @@
     "node": "^20.3.0 || >=22.0.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "sharp", "workerd"]
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "workerd"
+    ]
   },
   "scripts": {
     "dev": "astro dev",
@@ -28,6 +32,7 @@
     "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "wrangler": "^4.81.1"
   }
 }
