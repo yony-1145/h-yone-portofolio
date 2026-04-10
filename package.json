@@ -2,7 +2,7 @@
   "name": "h-yone",
   "type": "module",
   "version": "0.0.2",
-  "packageManager": "pnpm@10.18.2+sha512-n7lp+nSbOt5gNeDxCfC4pgtdCKGof99y4zfakNzJMzbiKAyk5E8jWKZJuDwXlZ6Zk+d3wggIefOAHm8NmZrT3Q==",
+  "packageManager": "pnpm@10.18.2",
   "engines": {
     "node": "^20.3.0 || >=22.0.0"
   },
