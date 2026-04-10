@@ -16,7 +16,10 @@ export default defineConfig({
 			Beasties: true,
 		}),
 	],
-	adapter: cloudflare(),
+	adapter: cloudflare({
+		// Cloudflare ランタイムでは sharp は使えない。静的生成時に画像を最適化する（公式推奨）
+		imageService: "compile",
+	}),
 	output: "static",
 	devToolbar: {
 		enabled: false,

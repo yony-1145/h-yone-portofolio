@@ -12,8 +12,8 @@
 
 ## 必要な環境
 
-- [Node.js](https://nodejs.org/)（Astro 5 が推奨するバージョン）
-- [pnpm](https://pnpm.io/)（このリポジトリは `pnpm-lock.yaml` を使用）
+- [Node.js](https://nodejs.org/) LTS（`package.json` の `engines` および [Astro の要件](https://docs.astro.build/en/install-and-setup/)に準拠）
+- [pnpm](https://pnpm.io/)（`packageManager` フィールドの版を [Corepack](https://nodejs.org/api/corepack.html) で合わせるのが確実）
 
 ## セットアップ
 
@@ -54,6 +54,9 @@ cp .env.example .env
 
 サイト名・連絡先メール・SNS などの定数は `src/data/config.ts` を編集してください。
 
-## デプロイ
+## デプロイ（Cloudflare）
 
-Cloudflare（`@astrojs/cloudflare`）向けの設定になっています。本番では Resend・Turnstile のシークレットをホスティング側の環境変数に設定し、Resend の送信ドメインと Turnstile の許可ドメインを本番 URL に合わせてください。
+- ビルド: `pnpm build`（成果物は `dist/`。`@astrojs/cloudflare` が Pages Functions 用アセットを同梱します）
+- ランタイム設定: ルートの [`wrangler.jsonc`](./wrangler.jsonc)（`SESSION` KV は [Astro Sessions](https://docs.astro.build/en/guides/sessions/) 用。ID なしは [Wrangler の自動プロビジョニング](https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning)の対象。手動で作る場合は `id` を追記）
+- 手順の詳細は [Astro × Cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) と [Pages のビルド設定](https://developers.cloudflare.com/pages/configuration/build-configuration/)を参照
+- シークレット（`RESEND_*` / `TURNSTILE_SECRET_KEY` など）は Cloudflare の環境変数に設定し、Resend のドメイン・Turnstile の許可ホストをデプロイ先 URL に合わせる
