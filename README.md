@@ -54,19 +54,34 @@ cp .env.example .env
 
 サイト名・連絡先メール・SNS などの定数は `src/data/config.ts` を編集してください。
 
-## デプロイ（Cloudflare Pages）
+## デプロイ（Cloudflare）
 
-ダッシュボードで **Workers ではなく Pages** のプロジェクトを作成し、Git リポジトリを接続します。
+共通: 先に `pnpm run build` で `dist/` を生成する。`package.json` の `engines` に合う Node（例: 20 または 22）を使う。
+
+### Workers（`wrangler deploy` / Workers Builds）
+
+[`wrangler.toml`](./wrangler.toml) で **Worker の入口**（`main`）と **静的アセット**（`[assets]`）を分ける。`dist` 内の `_worker.js` はサーバー用のため、[`.assetsignore`](./public/.assetsignore)（ビルドで `dist/.assetsignore` にコピーされる）に `_worker.js` と `_routes.json` を書き、**アセットとしてはアップロードしない**。
+
+| 手順 | コマンド / 設定 |
+| --- | --- |
+| ビルド | `pnpm run build` |
+| デプロイ | `npx wrangler deploy`（ルートの `wrangler.toml` を使う） |
+
+`npx wrangler deploy --assets=./dist` **だけ**だと `main` がなく、`_worker.js` を公開アセットとして載せようとして失敗する。`--assets` は省略し、設定は `wrangler.toml` に任せる。
+
+環境変数・シークレットは **Workers** の設定（ダッシュボードまたは `wrangler secret`）に置く。Resend・Turnstile の許可ドメインはデプロイ先 URL に合わせる。
+
+### Pages（Git 連携のみ）
+
+ダッシュボードで **Pages** プロジェクトを作り、リポジトリを接続する。
 
 | 設定 | 値 |
 | --- | --- |
-| ルートディレクトリ | `/`（リポジトリルート） |
+| ルートディレクトリ | `/` |
 | ビルドコマンド | `pnpm run build` |
 | ビルド出力ディレクトリ | `dist` |
-| 環境変数 | 本番・プレビューそれぞれに `.env.example` 相当を設定 |
+| デプロイコマンド | 空にする（push でビルド・デプロイ） |
 
-- **Node.js**: `package.json` の `engines` に合わせる（例: 20 または 22）
-- **ランタイム / バインディング**: ルートの [`wrangler.toml`](./wrangler.toml)（`SESSION` KV は [Astro Sessions](https://docs.astro.build/en/guides/sessions/) 用。必要ならダッシュボードの **設定 → 関数 → KV バインディング**でも `SESSION` を接続）
-- 手順の詳細は [Astro × Cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) と [Pages のビルド設定](https://developers.cloudflare.com/pages/configuration/build-configuration/)を参照
-- ローカルから直接アップロードする場合: `pnpm build` のあと `pnpm exec wrangler pages deploy dist --project-name=h-yone`（プロジェクト名は実際の名前に合わせる）
-- シークレット（`RESEND_*` / `TURNSTILE_SECRET_KEY` など）は Pages の環境変数に設定し、Resend のドメイン・Turnstile の許可ホストをデプロイ先 URL に合わせる
+`wrangler.toml` の KV などは Pages でも参照されることがある。**Pages では `wrangler deploy` は使わない。** 手元から載せる場合は `pnpm exec wrangler pages deploy dist --project-name=h-yone`。
+
+詳細は [Astro × Cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/) と [Pages のビルド設定](https://developers.cloudflare.com/pages/configuration/build-configuration/)を参照。

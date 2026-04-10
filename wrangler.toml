@@ -1,9 +1,13 @@
-# Cloudflare Pages — Astro の Functions 用（KV などのバインディング）
-# name はダッシュボードの Pages プロジェクト名と一致させる
-# Git 連携の Pages では dist ごとアップロードされるため main / [assets] は不要
+# Cloudflare Workers（静的アセット + Astro の _worker.js）
+# Astro の API / プリレンダー以外はこの Worker が配信する
 name = "h-yone"
+main = "./dist/_worker.js/index.js"
 compatibility_date = "2026-04-10"
 compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
 
 [[kv_namespaces]]
 binding = "SESSION"
