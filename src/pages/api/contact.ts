@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { Resend } from "resend";
 import { email as contactEmail } from "~/data/config";
-import { buildAutoReplyHtml, escapeHtml } from "~/lib/auto-reply-email";
+import { buildAutoReplyHtml, escapeHtml, publicSiteUrl, getEmailLabels } from "~/lib/auto-reply-email";
 
 export const prerender = false;
 
@@ -156,7 +156,7 @@ export const POST: APIRoute = async ({ request }) => {
 		const escapedName = escapeHtml(validation.value.name);
 		const escapedEmail = escapeHtml(validation.value.senderEmail);
 		const escapedMessage = escapeHtml(validation.value.message).replaceAll("\n", "<br />");
-		const siteUrl = "https://h-yone.com";
+		const siteUrl = publicSiteUrl();
 		const inquiryLabel = escapeHtml(
 			getInquiryTypeLabel(validation.value.inquiryType, validation.value.locale),
 		);
@@ -237,12 +237,14 @@ export const POST: APIRoute = async ({ request }) => {
 						`Hiromi Yonemoto | ${siteUrl}`,
 					].join("\n");
 
+		const emailLabels = getEmailLabels(validation.value.locale);
 		const autoReplyHtml = buildAutoReplyHtml({
 			locale: validation.value.locale,
 			name: validation.value.name,
 			inquiryLabel: getInquiryTypeLabel(validation.value.inquiryType, validation.value.locale),
 			message: validation.value.message,
 			siteUrl,
+			...emailLabels,
 		});
 
 		const autoReplyResult = await resend.emails.send({

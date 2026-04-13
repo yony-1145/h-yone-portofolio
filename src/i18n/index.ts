@@ -218,6 +218,17 @@ const dict = {
     'page.contact.form.error.turnstile':
       'Security verification failed. Please retry the challenge.',
 
+    'email.autoReply.greeting': 'Hi',
+    'email.autoReply.thankYou':
+      'Thank you for reaching out.',
+    'email.autoReply.received':
+      'Your message has been received with the following details.',
+    'email.autoReply.inquiryType': 'Inquiry Type',
+    'email.autoReply.message': 'Message',
+    'email.autoReply.responseTime':
+      "I'll review your message and respond within 24 hours.",
+    'email.autoReply.signature': 'Hiromi Yonemoto',
+
     'page.privacy.title': 'Privacy Policy',
     'page.privacy.description': 'Our privacy policy.',
   },
@@ -368,6 +379,17 @@ const dict = {
       '入力内容に問題があります。確認して再度お試しください。',
     'page.contact.form.error.turnstile':
       'セキュリティ認証に失敗しました。認証をやり直してください。',
+
+    'email.autoReply.greeting': '様',
+    'email.autoReply.thankYou':
+      'お問い合わせいただきありがとうございます。',
+    'email.autoReply.received':
+      '以下の内容で受け付けました。',
+    'email.autoReply.inquiryType': 'お問い合わせ種別',
+    'email.autoReply.message': 'メッセージ',
+    'email.autoReply.responseTime':
+      '内容を確認のうえ、24時間以内にご返信いたします。',
+    'email.autoReply.signature': 'Hiromi Yonemoto',
 
     'page.privacy.title': 'プライバシーポリシー',
     'page.privacy.description': 'プライバシーポリシー。',
