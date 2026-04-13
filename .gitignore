@@ -1,9 +1,30 @@
-.DS_Store
-.vercel/
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*-debug.log*
+
+# environment variables
 .env
 .env.*
 !.env.example
-node_modules/
-dist/
-.astro/
-*-debug.log*
+
+# Vercel output
+.vercel/
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/

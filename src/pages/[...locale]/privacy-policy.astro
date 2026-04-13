@@ -1,0 +1,30 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import Section from "~/components/Section.astro";
+import Article from "~/components/Article.astro";
+import { siteDomain } from "~/data/config";
+import { getLocaleStaticPaths, defaultLocale, t, type Locale } from "~/i18n";
+
+export const getStaticPaths = getLocaleStaticPaths;
+
+const locale = (Astro.params.locale ?? defaultLocale) as Locale;
+---
+
+<Layout title={t("page.privacy.title", locale)} description={t("page.privacy.description", locale)}>
+	<Section>
+		<Article contain>
+			<h1>{t("page.privacy.title", locale)}</h1>
+			{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+				<p>
+					{i === 1 ? (
+						<>
+							{t(`page.privacy.body.p${i}` as any, locale)} <a href={`https://${siteDomain}`}>{siteDomain}</a> {locale === "ja" ? "" : ""}
+						</>
+					) : (
+						t(`page.privacy.body.p${i}` as any, locale)
+					)}
+				</p>
+			))}
+		</Article>
+	</Section>
+</Layout>

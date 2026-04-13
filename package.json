@@ -1,4 +1,36 @@
 {
-  "private": true,
-  "packageManager": "pnpm@10.18.2"
+  "name": "h-yone",
+  "type": "module",
+  "version": "0.0.2",
+  "packageManager": "pnpm@10.18.2",
+  "engines": {
+    "node": "^20.3.0 || >=22.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/alpinejs": "^0.4.6",
+    "@astrojs/vercel": "^9.0.5",
+    "@playform/inline": "^0.1.2",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tailwindcss/vite": "^4.1.4",
+    "@types/alpinejs": "^3.13.11",
+    "alpinejs": "^3.14.9",
+    "astro": "^5.7.4",
+    "resend": "^6.10.0",
+    "tailwindcss": "^4.1.4"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
 }
