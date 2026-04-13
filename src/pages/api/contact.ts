@@ -20,6 +20,10 @@ interface ContactPayload {
 }
 
 function getClientIp(request: Request): string {
+	// Cloudflare provides cf-connecting-ip as the client IP
+	const cfIp = request.headers.get("cf-connecting-ip");
+	if (cfIp) return cfIp;
+	// Fallback to x-forwarded-for for other proxies
 	const forwardedFor = request.headers.get("x-forwarded-for");
 	if (!forwardedFor) return "";
 	return forwardedFor.split(",")[0]?.trim() ?? "";
