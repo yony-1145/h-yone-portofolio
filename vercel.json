@@ -3,7 +3,9 @@
   "buildCommand": "cd portfolio && pnpm run build",
   "installCommand": "cd portfolio && pnpm install",
   "outputDirectory": "portfolio/.vercel/output",
-  "env": {
-    "ENABLE_EXPERIMENTAL_COREPACK": "1"
+  "build": {
+    "env": {
+      "ENABLE_EXPERIMENTAL_COREPACK": "1"
+    }
   }
 }
