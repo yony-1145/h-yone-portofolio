@@ -61,7 +61,11 @@ export function localizePath(pathname: string, locale: Locale): string {
 
   if (relative === '/') return import.meta.env.BASE_URL;
   const bare = deploymentBasePath();
-  return `${bare}${relative}`;
+  const hashIdx = relative.indexOf('#');
+  const pathPart = hashIdx === -1 ? relative : relative.slice(0, hashIdx);
+  const hashPart = hashIdx === -1 ? '' : relative.slice(hashIdx);
+  const pathWithSlash = pathPart.endsWith('/') ? pathPart : `${pathPart}/`;
+  return `${bare}${pathWithSlash}${hashPart}`;
 }
 
 export function getLocaleStaticPaths() {
