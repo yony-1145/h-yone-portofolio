@@ -234,6 +234,22 @@ const dict = {
 
     'page.privacy.title': 'Privacy Policy',
     'page.privacy.description': 'Our privacy policy.',
+    'page.privacy.body.p1':
+      'Your privacy is important to us. It is our policy to respect your privacy regarding any information we may collect from you across our website, and other sites we own and operate.',
+    'page.privacy.body.p2':
+      'We only ask for personal information when we truly need it to provide a service to you. We collect it by fair and lawful means, with your knowledge and consent. We also let you know why we\'re collecting it and how it will be used.',
+    'page.privacy.body.p3':
+      'We only retain collected information for as long as necessary to provide you with your requested service. What data we store, we\'ll protect within commercially acceptable means to prevent loss and theft, as well as unauthorised access, disclosure, copying, use or modification.',
+    'page.privacy.body.p4':
+      'We don\'t share any personally identifying information publicly or with third-parties, except when required to by law.',
+    'page.privacy.body.p5':
+      'Our website may link to external sites that are not operated by us. Please be aware that we have no control over the content and practices of these sites, and cannot accept responsibility or liability for their respective privacy policies.',
+    'page.privacy.body.p6':
+      'You are free to refuse our request for your personal information, with the understanding that we may be unable to provide you with some of your desired services.',
+    'page.privacy.body.p7':
+      'Your continued use of our website will be regarded as acceptance of our practices around privacy and personal information. If you have any questions about how we handle user data and personal information, feel free to contact us.',
+    'page.privacy.body.p8':
+      'This policy is effective as of 1 January 2026.',
   },
   ja: {
     'menu.home': 'ホーム',
@@ -396,6 +412,22 @@ const dict = {
 
     'page.privacy.title': 'プライバシーポリシー',
     'page.privacy.description': 'プライバシーポリシー。',
+    'page.privacy.body.p1':
+      'お客様のプライバシーは私たちにとって重要です。当ウェブサイトおよびその他の運営サイトを通じて収集する情報に関して、お客様のプライバシーを尊重することが私たちの方針です。',
+    'page.privacy.body.p2':
+      'サービスの提供に真に必要な場合にのみ、個人情報の提供をお願いしています。公正かつ合法的な手段により、お客様の知識と同意のもとで収集します。また、収集の理由と使用方法についてもお知らせします。',
+    'page.privacy.body.p3':
+      '収集した情報は、お客様が要求したサービスを提供するために必要な期間のみ保持します。保存するデータは、紛失や盗難、不正アクセス、開示、コピー、使用、変更を防ぐために、商業的に許容される手段で保護します。',
+    'page.privacy.body.p4':
+      '法律で義務付けられている場合を除き、個人を特定できる情報を公開したり、第三者と共有したりすることはありません。',
+    'page.privacy.body.p5':
+      '当ウェブサイトには、私たちが運営していない外部サイトへのリンクが含まれている場合があります。これらのサイトのコンテンツおよび慣行については管理できず、それぞれのプライバシーポリシーについて責任を負うことはできませんのでご了承ください。',
+    'page.privacy.body.p6':
+      'お客様は、個人情報の提供を拒否する自由がありますが、一部のサービスを提供できなくなる可能性があることをご理解ください。',
+    'page.privacy.body.p7':
+      '当ウェブサイトの継続的なご利用は、プライバシーおよび個人情報に関する私たちの慣行を承諾したものとみなされます。ユーザーデータおよび個人情報の取り扱いについてご質問がある場合は、お気軽にお問い合わせください。',
+    'page.privacy.body.p8':
+      '本ポリシーは2026年1月1日より有効です。',
   },
 } satisfies Record<Locale, Record<string, string>>;
 
