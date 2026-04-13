@@ -7,9 +7,10 @@ interface Props {
 
 const { locale = defaultLocale } = Astro.props;
 const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY ?? "";
+const contactApiUrl = `${import.meta.env.BASE_URL}api/contact`;
 ---
 
-<script is:inline>
+<script is:inline define:vars={{ contactApiUrl }}>
 	const initContactTurnstile = () => {
 		const container = document.getElementById("contact-turnstile");
 		if (!container || container.dataset.rendered === "true") return;
@@ -66,7 +67,7 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY ?? "";
 			locale: getValue('locale'),
 			token,
 		};
-		fetch('/api/contact', {
+		fetch(contactApiUrl, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload),
@@ -103,7 +104,6 @@ const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY ?? "";
 	"
 >
 	<input type="hidden" name="locale" value={locale} />
-	<input type="checkbox" name="botcheck" class="hidden" style="display: none;" />
 
 	<div x-show="status === 'success'" x-cloak class="rounded-xl bg-brand-green/10 border border-brand-green/30 p-6 text-center text-brand-green font-medium mb-6">
 		{t("page.contact.form.success", locale)}

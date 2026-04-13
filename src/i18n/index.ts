@@ -7,24 +7,57 @@ function isLocale(value: string | undefined): value is Locale {
   return value === 'en' || value === 'ja';
 }
 
+/** `import.meta.env.BASE_URL` は末尾 `/` 付き（`trailingSlash: "always"`）。プレフィックス除去用に末尾だけ落とす。 */
+function deploymentBasePath(): string {
+  const b = import.meta.env.BASE_URL;
+  if (!b || b === '/') return '';
+  return b.replace(/\/$/, '');
+}
+
+/** Strip `base` prefix from a pathname (e.g. `/portfolio/ja` → `/ja`). */
+export function stripDeploymentBase(pathname: string): string {
+  const base = deploymentBasePath();
+  if (!base) return pathname;
+  if (pathname === base) return '/';
+  if (pathname.startsWith(`${base}/`)) {
+    const rest = pathname.slice(base.length);
+    return rest || '/';
+  }
+  return pathname;
+}
+
 export function getLocaleFromUrl(url: URL): Locale {
-  const [, maybeLocale] = url.pathname.split('/');
+  const path = stripDeploymentBase(url.pathname);
+  const [, maybeLocale] = path.split('/');
   return isLocale(maybeLocale) ? maybeLocale : defaultLocale;
 }
 
 export function stripLocaleFromPathname(pathname: string): string {
-  const parts = pathname.split('/');
+  const path = stripDeploymentBase(pathname);
+  const parts = path.split('/');
   const maybeLocale = parts[1];
-  if (!isLocale(maybeLocale)) return pathname;
+  if (!isLocale(maybeLocale)) return path;
   const stripped = '/' + parts.slice(2).join('/');
   return stripped === '//' ? '/' : stripped.replace(/\/+$/, '') || '/';
 }
 
 export function localizePath(pathname: string, locale: Locale): string {
-  const base = stripLocaleFromPathname(pathname);
-  if (locale === defaultLocale) return base === '' ? '/' : base;
-  if (base === '/') return `/${locale}/`;
-  return `/${locale}${base.startsWith('/') ? '' : '/'}${base}`;
+  const path = stripDeploymentBase(pathname);
+  const withoutLocale = stripLocaleFromPathname(path);
+  const inner = withoutLocale === '' ? '/' : withoutLocale;
+
+  let relative: string;
+  if (locale === defaultLocale) {
+    relative = inner === '/' ? '/' : inner;
+  } else if (inner === '/') {
+    relative = `/${locale}/`;
+  } else {
+    relative = `/${locale}${inner.startsWith('/') ? inner : `/${inner}`}`;
+  }
+
+  if (relative === '/') return import.meta.env.BASE_URL;
+  const bare = deploymentBasePath();
+  return `${bare}${relative}`;
 }
 
 export function getLocaleStaticPaths() {
@@ -184,7 +217,6 @@ const dict = {
       'Please check your input and try again.',
     'page.contact.form.error.turnstile':
       'Security verification failed. Please retry the challenge.',
-    'page.contact.form.subject': 'New Inquiry from h-yone Portfolio Site',
 
     'page.privacy.title': 'Privacy Policy',
     'page.privacy.description': 'Our privacy policy.',
@@ -336,8 +368,6 @@ const dict = {
       '入力内容に問題があります。確認して再度お試しください。',
     'page.contact.form.error.turnstile':
       'セキュリティ認証に失敗しました。認証をやり直してください。',
-    'page.contact.form.subject':
-      'h-yone ポートフォリオサイトからのお問い合わせ',
 
     'page.privacy.title': 'プライバシーポリシー',
     'page.privacy.description': 'プライバシーポリシー。',
