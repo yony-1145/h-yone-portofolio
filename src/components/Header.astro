@@ -1,11 +1,12 @@
 ---
 import { menuMain } from "~/data/menus";
-import { getLocaleFromUrl, localizePath, t, trimTrailingSlash } from "~/i18n";
+import { getLocaleFromUrl, localizePath, t, trimTrailingSlash, stripLocaleFromPathname } from "~/i18n";
 
 const locale = getLocaleFromUrl(Astro.url);
 const otherLocale = locale === "ja" ? "en" : "ja";
 
-const pathname = trimTrailingSlash(Astro.url.pathname);
+const withoutLocale = stripLocaleFromPathname(Astro.url.pathname);
+const pathname = trimTrailingSlash(withoutLocale);
 const localizedPathname = trimTrailingSlash(localizePath(pathname, locale));
 const switchToHref = localizePath(pathname, otherLocale);
 ---
