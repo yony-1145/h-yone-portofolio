@@ -1,9 +1,15 @@
+# [Legacy] Cloudflare Workers 用デプロイ設定。現在は Vercel にデプロイしているため未使用。
+# ロールバック時に astro.config.mjs のアダプタを @astrojs/cloudflare に戻した上で `wrangler deploy` で利用する。
 # Cloudflare Workers（静的アセット + Astro の _worker.js）
 # Astro の API / プリレンダー以外はこの Worker が配信する
 name = "h-yone"
 main = "./dist/_worker.js/index.js"
 compatibility_date = "2026-04-10"
 compatibility_flags = ["nodejs_compat"]
+
+# 本番: h-yone.com を Cloudflare DNS で管理している場合のみ有効。
+# www 利用時は別行で "www.h-yone.com/portfolio*" を追加。
+routes = [{ pattern = "h-yone.com/portfolio*", zone_name = "h-yone.com" }]
 
 [assets]
 directory = "./dist"

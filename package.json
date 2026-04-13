@@ -22,6 +22,7 @@
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.6",
     "@astrojs/cloudflare": "^12.6.13",
+    "@astrojs/vercel": "^9.0.5",
     "@playform/inline": "^0.1.2",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.4",

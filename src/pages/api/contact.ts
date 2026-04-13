@@ -20,13 +20,18 @@ interface ContactPayload {
 }
 
 function getClientIp(request: Request): string {
-	// Cloudflare provides cf-connecting-ip as the client IP
-	const cfIp = request.headers.get("cf-connecting-ip");
-	if (cfIp) return cfIp;
-	// Fallback to x-forwarded-for for other proxies
+	// [Legacy: Cloudflare] Cloudflare provides cf-connecting-ip as the client IP
+	// const cfIp = request.headers.get("cf-connecting-ip");
+	// if (cfIp) return cfIp;
+
+	// Vercel: x-forwarded-for (comma-separated; first entry is the client) or x-real-ip
 	const forwardedFor = request.headers.get("x-forwarded-for");
-	if (!forwardedFor) return "";
-	return forwardedFor.split(",")[0]?.trim() ?? "";
+	if (forwardedFor) {
+		const first = forwardedFor.split(",")[0]?.trim();
+		if (first) return first;
+	}
+	const realIp = request.headers.get("x-real-ip");
+	return realIp ?? "";
 }
 
 function normalizeText(value: unknown): string {
