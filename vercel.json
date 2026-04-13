@@ -2,5 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "cd portfolio && pnpm run build",
   "installCommand": "cd portfolio && pnpm install",
-  "outputDirectory": "portfolio/.vercel/output"
+  "outputDirectory": "portfolio/.vercel/output",
+  "env": {
+    "ENABLE_EXPERIMENTAL_COREPACK": "1"
+  }
 }
