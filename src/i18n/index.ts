@@ -26,6 +26,10 @@ export function stripDeploymentBase(pathname: string): string {
   return pathname;
 }
 
+export function trimTrailingSlash(path: string): string {
+  return path.endsWith("/") && path.length > 1 ? path.slice(0, path.length - 1) : path;
+}
+
 export function getLocaleFromUrl(url: URL): Locale {
   const path = stripDeploymentBase(url.pathname);
   const [, maybeLocale] = path.split('/');
