@@ -81,7 +81,6 @@ const dict = {
     'footer.tagline': 'Build, Deliver, Connect.',
     'footer.email': 'contact@h-yone.com',
     'cta.contact': 'Contact Me',
-    'cta.getInTouch': 'Get in touch',
 
     'a11y.navMain': 'Main navigation',
     'a11y.openMenu': 'Open main menu',
