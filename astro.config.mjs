@@ -20,7 +20,11 @@ export default defineConfig({
 	integrations: [
 		alpinejs(),
 		playformInline({
-			Beasties: true,
+			Beasties: {
+				pruneSource: false,
+				preload: "media",
+				inlineFonts: true,
+			},
 		}),
 	],
 	// [Legacy: Cloudflare] Cloudflare ランタイムでは sharp が使えないため compile 時に画像最適化を行っていた。
