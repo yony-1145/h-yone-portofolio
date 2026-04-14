@@ -9,8 +9,6 @@ import vercel from "@astrojs/vercel";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://h-yone.com",
-	base: "/portfolio",
-	// BASE_URL を `/portfolio/` のように末尾スラッシュ付きに揃える（公式: trailingSlash と base の組み合わせ）
 	trailingSlash: "always",
 	// [Legacy: Cloudflare] Astro.session を使わないため KV バインディング不要。
 	// 未指定だと @astrojs/cloudflare が SESSION KV を自動要求したため driver を memory に固定していた。
