@@ -6,12 +6,5 @@
     "env": {
       "ENABLE_EXPERIMENTAL_COREPACK": "1"
     }
-  },
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/portfolio/",
-      "permanent": true
-    }
-  ]
+  }
 }
