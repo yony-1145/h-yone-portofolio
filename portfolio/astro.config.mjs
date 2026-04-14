@@ -8,7 +8,7 @@ import vercel from "@astrojs/vercel";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://h-yone.com",
+	site: "https://www.h-yone.com",
 	trailingSlash: "always",
 	// [Legacy: Cloudflare] Astro.session を使わないため KV バインディング不要。
 	// 未指定だと @astrojs/cloudflare が SESSION KV を自動要求したため driver を memory に固定していた。
@@ -19,7 +19,11 @@ export default defineConfig({
 	integrations: [
 		alpinejs(),
 		playformInline({
-			Beasties: true,
+			Beasties: {
+				pruneSource: false,
+				preload: "media",
+				inlineFonts: true,
+			},
 		}),
 	],
 	// [Legacy: Cloudflare] Cloudflare ランタイムでは sharp が使えないため compile 時に画像最適化を行っていた。
