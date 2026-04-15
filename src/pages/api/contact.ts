@@ -98,24 +98,38 @@ async function verifyTurnstileToken(token: string, ip: string): Promise<boolean>
 		body.set("remoteip", ip);
 	}
 
-	const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body,
-	});
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), 5000);
 
-	if (!response.ok) return false;
+	try {
+		const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body,
+			signal: controller.signal,
+		});
 
-	const result = (await response.json()) as { success?: boolean };
-	return result.success === true;
+		if (!response.ok) return false;
+
+		const result = (await response.json()) as { success?: boolean };
+		return result.success === true;
+	} finally {
+		clearTimeout(timeout);
+	}
 }
 
 export const POST: APIRoute = async ({ request }) => {
+	console.info('[contact-api] invoked');
 	if (
 		!import.meta.env.RESEND_API_KEY ||
 		!import.meta.env.TURNSTILE_SECRET_KEY ||
 		!import.meta.env.RESEND_FROM_EMAIL
 	) {
+		console.error('[contact-api] missing env', {
+			resend: !!import.meta.env.RESEND_API_KEY,
+			turnstileSecret: !!import.meta.env.TURNSTILE_SECRET_KEY,
+			from: !!import.meta.env.RESEND_FROM_EMAIL,
+		});
 		return new Response(JSON.stringify({ ok: false, error: "server_error" }), {
 			status: 500,
 			headers: { "Content-Type": "application/json" },
@@ -194,7 +208,7 @@ export const POST: APIRoute = async ({ request }) => {
 			</div>
 		`;
 
-		const adminSendResult = await resend.emails.send({
+		const adminSendPromise = resend.emails.send({
 			from: import.meta.env.RESEND_FROM_EMAIL,
 			to: [contactEmail.label],
 			replyTo: validation.value.senderEmail,
@@ -202,6 +216,12 @@ export const POST: APIRoute = async ({ request }) => {
 			text: adminText,
 			html: adminHtml,
 		});
+
+		const adminTimeout = new Promise((_, reject) =>
+			setTimeout(() => reject(new Error('Resend admin send timeout')), 10000)
+		);
+
+		const adminSendResult = await Promise.race([adminSendPromise, adminTimeout]);
 
 		if (adminSendResult.error) {
 			console.error("Resend admin send failed:", adminSendResult.error);
@@ -256,7 +276,7 @@ export const POST: APIRoute = async ({ request }) => {
 			...emailLabels,
 		});
 
-		const autoReplyResult = await resend.emails.send({
+		const autoReplyPromise = resend.emails.send({
 			from: import.meta.env.RESEND_FROM_EMAIL,
 			to: [validation.value.senderEmail],
 			subject:
@@ -266,6 +286,12 @@ export const POST: APIRoute = async ({ request }) => {
 			text: autoReplyText,
 			html: autoReplyHtml,
 		});
+
+		const autoReplyTimeout = new Promise((_, reject) =>
+			setTimeout(() => reject(new Error('Resend auto-reply send timeout')), 10000)
+		);
+
+		const autoReplyResult = await Promise.race([autoReplyPromise, autoReplyTimeout]);
 
 		if (autoReplyResult.error) {
 			console.error("Resend auto-reply send failed:", autoReplyResult.error);

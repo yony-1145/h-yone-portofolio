@@ -1,108 +1,74 @@
-# PLAN: dev/prod 表示差分の解消
+# Contact Form 送信ハング修正計画
 
-## Context / Problem
+## Context
+本番 (www.h-yone.com/portfolio/) の問い合わせフォームで送信ボタン押下後にスピナーが回り続け、メールが届かない。ローカルでは UI は動作しているように見える。原因は複数の疑いがあり、まず**診断用ログを追加して実態を掴み**、判明した根本原因に応じて最小修正を入れる方針。ついでにフォーム側のエラー可視化不足も直す（現状は `unknown_error` にしか出ないので現地で何が起きているか分からない）。
 
-- 症状: `https://www.h-yone.com/portfolio/` の本番サイトと `astro dev` の開発環境で、コンポーネント配置と画像サイズに差分がある。
-- 根本原因: `@playform/inline@0.1.4`（Beasties 統合）が既定の `pruneSource: true` で動作し、9 枚の HTML が共有する単一 CSS ファイル `dist/client/_astro/about-me.*.css` を 9 回連続で剪定している。
-- 影響: 先行ページの critical CSS 抽出時に剪定された Tailwind ユーティリティ（`.container` 系メディアクエリ、`lg:grid-cols-2`、`w-full`、`max-w-[480px]`、`h-auto` 等）が、後続ページで必要でも共有 CSS から失われ、prod の一部ページで配置・画像サイズに崩れが発生する。
-- 根拠: Vercel ビルドログに `Inlined ... of _astro/about-me.BmJPv8Yf.css` と `... was successfully updated` が 9 回連続で記録されている。詳細は `.claude/research.md` 参照。
+## 調査済み事実
+- API route: `src/pages/api/contact.ts` に `export const prerender = false` が設定済み。
+- ビルド成果物 `.vercel/output/config.json:40` で `^/api/contact/$` → `_render` に正しくマップされている。
+- Astro 5.7.4 + `@astrojs/vercel@9.0.5`、`output: "static"` でも on-demand ルートとして関数化される構成。
+- 送信ボタンの submit ハンドラ (`src/components/forms/FormContact.astro:50-105`) は **`console.error` 等を一切出していない**。`.catch` では `errorCode = 'unknown_error'` のみ。
+- HEAD には `base: "/portfolio"` があるが、**作業ツリーで未コミットのまま削除されている** (`git diff astro.config.mjs`)。本番で何がデプロイされているかによりフェッチ先パスが変わる可能性がある。
+- `vercel.json` には `/` → `/portfolio/` の 308 redirect があり、プロジェクト自体は「ルートに Astro が出力される + ドメイン側の振る舞い」を前提にしている。
+- コメント `src/components/forms/FormContact.astro:10` 曰く `BASE_URL + api/contact/` で POST しており、「Vercel の 308 redirect 回避」のために末尾スラッシュを付けている。
 
-## Goal
+## ハング原因の主要仮説
+1. **Vercel の環境変数未設定**: `RESEND_API_KEY` / `TURNSTILE_SECRET_KEY` / `RESEND_FROM_EMAIL` / `TURNSTILE_SITE_KEY` のいずれかが Production に設定されていない。
+   - `TURNSTILE_SITE_KEY` 未定義ならウィジェット自体がレンダリングされず `turnstileVerified` が false のまま → ボタンが disabled。ただしユーザーは「押下できてスピナー表示」と言っているので本命ではない。
+   - サーバ側の `RESEND_*` / `TURNSTILE_SECRET_KEY` 未設定なら 500 が即返ってハングではなくエラー表示になるはず → 単独原因ではない可能性。
+2. **`base` / `BASE_URL` の不整合**: HEAD は `base: "/portfolio"` だが working tree では削除済み。最後にデプロイされたビルドがどちらかで挙動が変わる。
+   - HEAD 状態 (base あり) で build → BASE_URL=`/portfolio/` → POST 先 `/portfolio/api/contact/`。ただし `config.json` のルートは `/api/contact/` のみ。→ **どの route にもマッチしない → 404 ページの HTML が返るか、ドメイン設定次第で無限 redirect**。
+   - 作業ツリー状態 (base なし) で build → BASE_URL=`/` → POST 先 `/api/contact/` → マッチするが、ドメインが `/portfolio/*` しか受け付けない場合は外側で止まる可能性。
+3. **Turnstile の siteverify API が Vercel Function からブロック/タイムアウト** していて 300s のファンクションタイムアウトまで返ってこない（ユーザー視点では「いつまでも終わらない」）。
+4. **送信ハンドラ側のサイレント失敗**: `fetch` が reject した場合に `console.error` が無いので、そもそも何が起きたか本番で確認できていない（＝実はエラーで 30 秒後に再試行できるが UI に気付いていない可能性も残る）。
 
-- prod と dev の表示を一致させる。
-- critical CSS inline による LCP 改善は維持する（Beasties を完全無効化しない）。
+## 修正計画
 
-## Fix
+### Step 1: 診断を即入れる（コード変更）
+**ファイル**: `src/components/forms/FormContact.astro:50-105`
+- `.catch(err => { ... })` 内で `console.error('[contact-form] fetch failed', err)` を追加。
+- `.then` の中で 2xx 以外のとき `console.error('[contact-form] bad response', data.status, data.body)` を追加。
+- 送信開始時 `console.info('[contact-form] POST', contactApiUrl)` を追加（本番 URL を現地で確認可能にする）。
 
-### 必須: Beasties の `pruneSource` を無効化
+**ファイル**: `src/pages/api/contact.ts`
+- 先頭でハンドラ入ってきた時点で `console.info('[contact-api] invoked')` を 1 行入れる。
+- 115-118 行の早期 return の前に、どの env が落ちているかを `console.error('[contact-api] missing env', { resend: !!..., turnstileSecret: !!..., from: !!... })` で 1 度だけ出す（**値は出さない、存在フラグのみ**）。
+- Turnstile siteverify を `fetch` している 101-105 行に `AbortController` でタイムアウト（例 5s）を付け、タイムアウト時は 502 を返すようにする（300s ハング対策）。
 
-ファイル: `portfolio/astro.config.mjs:20-25`
+**検証**: ローカルで `pnpm build && pnpm preview` → Chrome DevTools の Console/Network タブで送信ボタンを押し、ログと実 URL・ステータスを確認。
 
-変更前:
-```js
-integrations: [
-    alpinejs(),
-    playformInline({
-        Beasties: true,
-    }),
-],
-```
+### Step 2: Vercel 側の診断
+1. ユーザーに Vercel Dashboard → Project → Settings → Environment Variables を確認してもらい、Production に以下 4 つが設定されているか確認:
+   - `RESEND_API_KEY`
+   - `RESEND_FROM_EMAIL`
+   - `TURNSTILE_SECRET_KEY`
+   - `TURNSTILE_SITE_KEY`
+2. 未設定なら追加 → 再デプロイ。
+3. Vercel Functions ログ (`_render` function) で Step 1 の `[contact-api]` ログが出ているか確認。出ていなければ関数すら起動していない（ルーティング問題）。
+4. 本番で再度送信し、ブラウザ Console と Network パネルから実際のリクエスト URL・ステータス・所要時間を取得。
 
-変更後:
-```js
-integrations: [
-    alpinejs(),
-    playformInline({
-        Beasties: {
-            pruneSource: false,
-            preload: "media",
-            inlineFonts: true,
-        },
-    }),
-],
-```
+### Step 3: 根本原因に応じた修正（Step 2 の結果で分岐）
+- **env 未設定だった場合**: Vercel 側で追加するだけで終了。コード修正不要。
+- **関数が起動していない / 404 / 308 ループだった場合**:
+  - `astro.config.mjs` の `base` を HEAD 同様 `"/portfolio"` に戻す（作業ツリーの未コミット削除を revert）。
+  - `vercel.json` の `/` → `/portfolio/` redirect が `base` と整合することを確認。
+  - 再ビルドして `.vercel/output/config.json` のルートが `/portfolio/api/contact/` になっていることを確認。
+  - ドメインが `www.h-yone.com` 直で入る場合の 308 (`/` → `/portfolio/`) が POST を GET に変えないか (permanent=true なので 301 相当、一部ブラウザで method が落ちる可能性) → `permanent: false` または 307/308 明示に変更検討。
+- **Turnstile siteverify がハングしていた場合**: Step 1 で入れた AbortController タイムアウトが効いて 502 が返る → UI 上はエラー表示 → 再リトライ可能。恒久対策として Turnstile の代わりにレスポンス到達のログを追加し、Vercel Function ログで再現性を確認。
+- **Resend 呼び出しがハングしていた場合**: `resend.emails.send` にも Promise.race + 10s タイムアウトを追加。
 
-理由:
-- `pruneSource: false` で共有 CSS からの剪定を止めると、どの HTML からも必要なルールが完全な形でロードされる。
-- inline 化自体は残るので critical CSS による初期描画改善は維持。
-- `preload: "media"` と `inlineFonts: true` は `@playform/inline@0.1.4` の既定値（`node_modules/@playform/inline/Target/Variable/Beasties.js`）と同じで、明示して意図を固定化する。
+### Step 4: フォーム UX の改善（根本原因修正と同時にまとめて）
+- エラー時の 30 秒 cooldown (`FormContact.astro:104`) をエラー時は 3 秒に短縮（成功時のみ 30 秒維持）。現状は失敗してもユーザーが 30 秒間再送信できず体験が悪い。
+- `errorCode === 'unknown_error'` 時に「時間を置いて再試行してください」明示メッセージを `i18n` に追加（既存の `page.contact.form.error` を流用でも可）。
 
-### 副次対応（任意・段階実施可）
+## 変更ファイル一覧
+- `src/components/forms/FormContact.astro` — 送信ハンドラにログ追加 + エラー時 cooldown 短縮
+- `src/pages/api/contact.ts` — 呼び出しログ + env 存在チェックログ + Turnstile/Resend のタイムアウト
+- `astro.config.mjs` — (Step 3 で必要なら) `base: "/portfolio"` を restore
+- `vercel.json` — (Step 3 で必要なら) redirect の `permanent` 見直し
 
-1. `@utility container` の max-width 打ち消しを明示
-   - ファイル: `portfolio/src/styles/global.css:12-15`
-   - 現状、Tailwind v4 既定の `.container` がブレークポイント毎の max-width を生成し、カスタム余白指定とマージされて意図しない max-width が残っている。
-   - 対処: `max-width: none;` を `@utility container` 内に追記するか、`.container` 利用を廃止して `mx-auto px-8` を直書きする。
-   - Beasties 側の修正で症状は解消する見込みだが、混乱を避けるための整理として推奨。
-
-2. `<Picture densities={[1]}>` の srcset 重複を解消
-   - ファイル: `portfolio/src/pages/[...locale]/index.astro:40-51, 113-123, 143-153`
-   - 現状、srcset に同一 URL が 2 度出力される Astro の既知挙動がある。
-   - 対処: `densities={[1]}` を削除するか `widths={[480, 960]}` 形式へ変更。
-
-## Verification
-
-1. ローカルビルド + preview で dev と比較
-   ```sh
-   cd portfolio
-   pnpm build
-   pnpm preview
-   ```
-   別ターミナルで `pnpm dev` を起動し、両方をブラウザで開いて以下を確認:
-   - トップの Hero 画像サイズ（480px 基準）が一致するか
-   - Projects セクションの 2 カラムグリッドが崩れていないか
-   - コンテナ幅（ビューポート 1280px / 1536px 付近）が一致するか
-   - `/about-me/`、`/contact/`、`/privacy-policy/` の各ページ配置が一致するか
-   - 日本語ロケール（`/ja/...`）も同様に確認
-
-2. ビルドログで挙動を確認
-   - `Inlined ... of _astro/about-me.*.css` は引き続き出力されること（inline は維持）。
-   - `_astro/about-me.*.css` のファイルサイズが各パスで変化しないこと（`pruneSource: false` 効果）。ビルド完了後に `ls -la dist/client/_astro/*.css` でサイズ確認。
-   - `Successfully inlined a total of 9 HTML files.` が引き続き出ること。
-
-3. Vercel デプロイ後に本番 URL で目視確認
-   - https://www.h-yone.com/portfolio/
-   - https://www.h-yone.com/portfolio/ja/
-   - https://www.h-yone.com/portfolio/about-me/
-   - https://www.h-yone.com/portfolio/contact/
-   - https://www.h-yone.com/portfolio/privacy-policy/
-
-4. ロールバック条件
-   - inline 化が 0 件になる / critical CSS が消えてしまう → Beasties 設定を見直す。
-   - 差分が残る → `playformInline` 自体を一時的に外して再ビルドし、Beasties 起因かどうかを切り分ける。
-   - いずれの場合も最低限の戻し先として `Beasties: true` に戻して再デプロイ可能。
-
-## Files Touched
-
-必須:
-- `portfolio/astro.config.mjs`
-
-任意（副次対応時）:
-- `portfolio/src/styles/global.css`
-- `portfolio/src/pages/[...locale]/index.astro`
-
-## References
-
-- 原因調査: `portfolio/.claude/research.md`
-- Beasties 既定値: `node_modules/@playform/inline/Target/Variable/Beasties.js`
-- Beasties 本体: https://github.com/danielroe/beasties （`pruneSource` オプションの挙動）
+## 検証
+1. **ローカル**: `pnpm build && pnpm preview`。Contact ページに移動 → DevTools Console を開いて送信 → `[contact-form] POST /api/contact/`・サーバログ `[contact-api] invoked` が両方出て、レスポンス内容が確認できる。
+2. **Preview デプロイ**: `git push` で Vercel Preview を作り、Vercel Functions Logs を開いたまま実機 (スマホ含む) で送信テスト。Turnstile 検証が通り、管理者宛メールと自動返信メールの両方が届くこと。
+3. **Production**: Preview で OK を確認後に Production へ promote。送信 → メール到達 → cooldown 30s → 30s 後に再送信可能を確認。
+4. **失敗系**: わざと invalid な email 形式で送信 → UI にエラー表示 → 3 秒で再送信可能に戻ることを確認。

@@ -9,7 +9,6 @@ import vercel from "@astrojs/vercel";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://www.h-yone.com",
-	base: "/portfolio",
 	trailingSlash: "always",
 	// [Legacy: Cloudflare] Astro.session を使わないため KV バインディング不要。
 	// 未指定だと @astrojs/cloudflare が SESSION KV を自動要求したため driver を memory に固定していた。
