@@ -45,7 +45,7 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 
 <form
 	id="contact-form"
-	x-data={JSON.stringify({ status: 'idle', cooldown: false, errorCode: '', turnstileVerified: false, contactApiUrl })}
+	x-data={`{ status: 'idle', cooldown: false, errorCode: '', turnstileVerified: false, contactApiUrl: '${contactApiUrl}' }`}
 	x-on:turnstile-verified.window="turnstileVerified = true"
 	x-on:turnstile-expired.window="turnstileVerified = false"
 	x-on:turnstile-error.window="turnstileVerified = false"
