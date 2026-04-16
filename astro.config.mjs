@@ -3,19 +3,12 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import alpinejs from "@astrojs/alpinejs";
 import playformInline from "@playform/inline";
-// [Legacy: Cloudflare] import cloudflare from "@astrojs/cloudflare";
-import vercel from "@astrojs/vercel";
+import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
 	site: "https://www.h-yone.com",
 	trailingSlash: "always",
-	// [Legacy: Cloudflare] Astro.session を使わないため KV バインディング不要。
-	// 未指定だと @astrojs/cloudflare が SESSION KV を自動要求したため driver を memory に固定していた。
-	// Vercel では KV を自動要求されないため不要。
-	// session: {
-	// 	driver: "memory",
-	// },
 	integrations: [
 		alpinejs(),
 		playformInline({
@@ -26,11 +19,10 @@ export default defineConfig({
 			},
 		}),
 	],
-	// [Legacy: Cloudflare] Cloudflare ランタイムでは sharp が使えないため compile 時に画像最適化を行っていた。
-	// adapter: cloudflare({
-	// 	imageService: "compile",
-	// }),
-	adapter: vercel(),
+	adapter: cloudflare({
+		imageService: "compile",
+		platformProxy: { enabled: true },
+	}),
 	output: "static",
 	devToolbar: {
 		enabled: false,

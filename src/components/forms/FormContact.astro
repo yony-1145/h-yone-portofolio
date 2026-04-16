@@ -7,7 +7,8 @@ interface Props {
 
 const { locale = defaultLocale } = Astro.props;
 const turnstileSiteKey = import.meta.env.TURNSTILE_SITE_KEY ?? "";
-// trailingSlash: "always" に合わせて末尾スラッシュ付きで POST する（Vercel の自動 308 redirect 回避）
+// trailingSlash: "always" に合わせて末尾スラッシュ付きで POST する
+// （Astro の 301 redirect と CF キャッシュ衝突を避けるため明示）
 const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 ---
 

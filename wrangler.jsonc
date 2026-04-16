@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workerd/main/npm/wrangler/config-schema.json",
+  "name": "h-yone-portfolio",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2025-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "none"
+  },
+  "observability": { "enabled": true },
+  "vars": {
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAC2kzutjleGzWFqG"
+  }
+}

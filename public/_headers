@@ -1,6 +1,3 @@
-# [Legacy] Cloudflare Pages / Workers Assets 用のセキュリティヘッダ定義。
-# 現在は Vercel にデプロイしており、同等の設定は vercel.json の headers で管理している。
-# Vercel はこのファイルを参照しないため無視されるが、ロールバック用に残している。
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff

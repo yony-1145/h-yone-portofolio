@@ -1,0 +1,11 @@
+# Cloudflare Workers local development environment variables
+# Copy to .dev.vars (not committed to git) and fill with actual values
+
+# Resend API key for sending contact emails
+RESEND_API_KEY=your_resend_api_key_here
+
+# Verified sender address on your Resend domain
+RESEND_FROM_EMAIL="h-yone <contact@h-yone.com>"
+
+# Cloudflare Turnstile secret key (server-only)
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key_here

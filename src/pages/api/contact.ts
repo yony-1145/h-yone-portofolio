@@ -20,11 +20,11 @@ interface ContactPayload {
 }
 
 function getClientIp(request: Request): string {
-	// [Legacy: Cloudflare] Cloudflare provides cf-connecting-ip as the client IP
-	// const cfIp = request.headers.get("cf-connecting-ip");
-	// if (cfIp) return cfIp;
+	// Cloudflare: cf-connecting-ip
+	const cfIp = request.headers.get("cf-connecting-ip");
+	if (cfIp) return cfIp;
 
-	// Vercel: x-forwarded-for (comma-separated; first entry is the client) or x-real-ip
+	// Fallback: x-forwarded-for (comma-separated; first entry is the client) or x-real-ip
 	const forwardedFor = request.headers.get("x-forwarded-for");
 	if (forwardedFor) {
 		const first = forwardedFor.split(",")[0]?.trim();
