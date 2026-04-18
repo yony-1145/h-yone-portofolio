@@ -120,6 +120,16 @@ async function verifyTurnstileToken(token: string, ip: string): Promise<boolean>
 
 export const POST: APIRoute = async ({ request }) => {
 	console.info('[contact-api] invoked');
+
+	const origin = request.headers.get("origin");
+	const expectedOrigin = new URL(request.url).origin;
+	if (origin && origin !== expectedOrigin) {
+		return new Response(JSON.stringify({ ok: false, error: "forbidden" }), {
+			status: 403,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
 	if (
 		!import.meta.env.RESEND_API_KEY ||
 		!import.meta.env.TURNSTILE_SECRET_KEY ||

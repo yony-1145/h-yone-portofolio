@@ -71,7 +71,6 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 			locale: getValue('locale'),
 			token,
 		};
-		console.info('[contact-form] POST', contactApiUrl);
 		fetch(contactApiUrl, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -85,7 +84,6 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 			} else {
 				status = 'error';
 				errorCode = data.body?.error || 'unknown_error';
-				console.error('[contact-form] bad response', data.status, data.body);
 			}
 			if (window.turnstile) {
 				const widgetId = document.getElementById('contact-turnstile')?.dataset.widgetId;
@@ -95,8 +93,7 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 			}
 			turnstileVerified = false;
 		})
-		.catch((err) => {
-			console.error('[contact-form] fetch failed', err);
+		.catch(() => {
 			status = 'error';
 			errorCode = 'unknown_error';
 			if (window.turnstile) {

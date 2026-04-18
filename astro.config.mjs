@@ -7,7 +7,7 @@ import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://www.h-yone.com",
+	site: "https://portfolio.h-yone.com",
 	trailingSlash: "always",
 	integrations: [
 		alpinejs(),

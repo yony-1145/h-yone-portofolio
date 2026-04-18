@@ -1,5 +1,5 @@
-# build output
-dist/
+# build output   git rm -r portfolio/
+   Remove orphan portfolio directory from git tracking 
 
 # generated types
 .astro/
@@ -29,6 +29,10 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
+# Windows-specific files
+Thumbs.db
+desktop.ini
+
 # jetbrains setting folder
 .idea/
 
@@ -37,3 +41,8 @@ pnpm-debug.log*
 
 # Cloudflare Workers dev environment
 .dev.vars
+
+# Common logs and caches
+*.log
+.eslintcache
+.stylelintcache
