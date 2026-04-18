@@ -31,3 +31,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Claude Code local files
+.claude/
+
+# Cloudflare Workers dev environment
+.dev.vars
