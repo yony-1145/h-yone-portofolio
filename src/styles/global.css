@@ -2,7 +2,7 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-	--font-inter: "Inter", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", "sans-serif";
+	--font-inter: "Inter", "Inter Fallback", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Meiryo", sans-serif;
 	--color-brand-green: #157f71;
 	--color-brand-red: #db1d00;
 	--color-brand-black: #111827;
@@ -114,6 +114,10 @@
 	--tw-prose-pre-bg: var(--color-gray-700);
 	--tw-prose-th-borders: var(--color-gray-300);
 	--tw-prose-td-borders: var(--color-gray-200);
+}
+
+html {
+	scrollbar-gutter: stable;
 }
 
 html,

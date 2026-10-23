@@ -12,13 +12,13 @@ const switchToHref = localizePath(pathname, otherLocale);
 ---
 
 <header
-	x-data="{ open: false, scrolled: false }"
+	x-data="{ open: false, scrolled: window.scrollY > 20 }"
 	@keydown.window.escape="open = false"
 	@scroll.window="scrolled = window.scrollY > 20"
-	class="sticky top-0 z-40 transition-all duration-300"
+	class="sticky top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300"
 	:class="scrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm' : 'bg-transparent'"
 >
-	<div class="container py-6" :class="scrolled && 'py-4'" >
+	<div class="container py-5">
 		<nav class="flex items-center justify-between" aria-label={t("a11y.navMain", locale)}>
 			<a href={localizePath("/", locale)} class="-m-1.5 p-1.5">
 				<p class="font-bold text-4xl text-brand-green">h<span class="text-brand-black">-</span><span class="text-brand-red bg-brand-red/5 px-3 ml-1 rounded-lg">yone</span></p>

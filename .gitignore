@@ -1,5 +1,5 @@
-# build output   git rm -r portfolio/
-   Remove orphan portfolio directory from git tracking 
+# build output
+dist/
 
 # generated types
 .astro/
@@ -46,3 +46,8 @@ desktop.ini
 *.log
 .eslintcache
 .stylelintcache
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/

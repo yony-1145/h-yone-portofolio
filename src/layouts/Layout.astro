@@ -18,6 +18,9 @@ const siteOrigin = Astro.site ?? new URL(Astro.url.origin);
 const ogImageUrl = new URL("images/og-image.jpg", new URL(assetBase, siteOrigin)).href;
 const faviconHref = `${assetBase}favicon.svg`;
 const humansHref = `${assetBase}humans.txt`;
+const preloadFonts = ["inter-v18-latin-regular.woff2", "inter-v18-latin-700.woff2", "inter-v18-latin-900.woff2"];
+const interFallbackFace =
+	`@font-face{font-family:"Inter Fallback";src:local("Arial");size-adjust:107.4%;ascent-override:90.2%;descent-override:22.5%;line-gap-override:0%;}`;
 const interFontFaces = (
 	[
 		["inter-v18-latin-300.woff2", "normal", 300],
@@ -60,7 +63,10 @@ const isContactPage = stripLocaleFromPathname(Astro.url.pathname).startsWith("/c
 		<link rel="author" href={humansHref} />
 		<meta name="msapplication-TileColor" content="#ffffff" />
 		<link rel="icon" type="image/svg+xml" href={faviconHref} />
-		<style is:inline set:html={interFontFaces}></style>
+		{preloadFonts.map((file) => (
+			<link rel="preload" as="font" type="font/woff2" href={`${assetBase}fonts/inter/${file}`} crossorigin />
+		))}
+		<style is:inline set:html={interFallbackFace + interFontFaces}></style>
 
 		<meta property="og:url" content={Astro.url} />
 		<meta property="og:type" content="website" />

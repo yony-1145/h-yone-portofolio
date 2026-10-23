@@ -168,14 +168,14 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 		<div>
 			<div
 				id="contact-turnstile"
-				class="cf-turnstile"
+				class="cf-turnstile min-h-[65px]"
 				data-sitekey={turnstileSiteKey}
 			></div>
 		</div>
 
 		<div>
 			<button type="submit" class="button button-green group !px-8" :disabled="status === 'sending' || !turnstileVerified">
-				<span x-show="status === 'sending'" class="loader inline-block mr-2"></span>
+				<span x-show="status === 'sending'" x-cloak class="loader inline-block mr-2"></span>
 				<span x-show="status !== 'sending'">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +192,7 @@ const contactApiUrl = `${import.meta.env.BASE_URL}api/contact/`;
 						></path>
 					</svg>
 				</span>
-				<span x-show="status === 'sending'">{t("page.contact.form.sending", locale)}</span>
+				<span x-show="status === 'sending'" x-cloak>{t("page.contact.form.sending", locale)}</span>
 				<span x-show="status !== 'sending'">{t("page.contact.form.send", locale)}</span>
 			</button>
 		</div>

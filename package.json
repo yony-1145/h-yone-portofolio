@@ -16,7 +16,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "playwright test"
   },
   "dependencies": {
     "@astrojs/alpinejs": "^0.4.6",
@@ -31,6 +32,7 @@
     "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "sharp": "^0.34.5",
     "wrangler": "^4.83.0"
   }
