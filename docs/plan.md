@@ -30,20 +30,24 @@ flowchart TD
 
 ---
 
-## 未決事項
+## 決定事項（実装済み）
 
-> [!IMPORTANT]
-> **Q1. ヘッダーの縮小アニメーションは残したいか？**
-> - **案 A（推奨）**：高さは固定にして、スクロール時は背景・ぼかし・影だけを変える。最もシンプルで CLS はゼロ。
-> - **案 B**：縮む見た目を残したい場合は、ヘッダーを `fixed` にして、本文側に固定の `padding-top` を確保する。ヘッダーが縮んでも本文は動かない。ただし本文との間に隙間が出る。
+- **Q1 ヘッダーの縮小アニメーション**：案 A を採用。高さは固定（`py-5`）にし、スクロール時は背景・ぼかし・影だけを変える。
+- **Q2 フォント対策**：案 A を採用。preload（400 / 700 / 900）と `Inter Fallback`（`size-adjust` など）を定義。
+- **Q3 自動テスト**：案を採用。Playwright を追加し、CLS とスクロール時のシフト、ヘッダー高さ、横ずれを測るテストを `tests/layout-shift.spec.ts` に置いた。
 
-> [!IMPORTANT]
-> **Q2. フォント対策の強さ**
-> - **案 A（推奨）**：よく使うウェイト（400 / 700 / 900）を preload し、メトリクスを Inter に合わせたフォールバックフォント（`size-adjust` など）を定義する。swap 時のずれがほぼ消える。
-> - **案 B**：`font-display: optional` に変更する。シフトはゼロになるが、Inter が表示されないことがある。ClientRouter を使っているため、一度フォールバックになると、フルリロードするまで Inter に切り替わらない可能性がある。
+## 進捗（2026-10-23）
 
-> [!WARNING]
-> **Q3. 自動テスト**：現在テストの仕組みはない。Playwright を devDependency に追加して CLS を測定するテストを入れるか、手動（Lighthouse / DevTools）での確認だけにするか。
+| 項目 | 状態 |
+|---|---|
+| #1 ヘッダー（固定 `py-5`、`scrolled` 初期値、transition 対象の限定） | 実装済み |
+| #2・#3 フォーム（`x-cloak`、Turnstile の `min-h-[65px]`） | 実装済み |
+| #4 フォント（preload、`Inter Fallback`） | 実装済み。`size-adjust` 等の微調整は未確認 |
+| #5 横ずれ（`scrollbar-gutter: stable`） | 実装済み |
+| CLS テスト（Playwright） | `pnpm test`：19 passed、1 skipped |
+
+- テストの skip：mobile の横ずれテストは意図的に skip（`tests/layout-shift.spec.ts:130`、「mobile uses overlay scrollbars」）。
+- 計測は Playwright 環境のみ。実機や Lighthouse での数値は未確認。
 
 ---
 
@@ -138,6 +142,7 @@ pnpm build && pnpm preview
 5. index ↔ contact を遷移して横ずれがないことを確認する（#5）。
 6. 目標：全ページで **CLS < 0.05**（Good の基準は 0.1）。
 
-### 手動確認
+### 手動確認（未実施）
 - ヘッダーの見た目（固定の `py-5`）がデザイン的に問題ないか
 - 実機（スマホ）で問い合わせフォームの表示がおかしくないか
+- `Inter Fallback` の補正値が実際のフォント切り替えで効いているか（DevTools で比較）
